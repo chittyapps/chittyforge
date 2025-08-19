@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
 import RiskAssessment from "@/components/ui/risk-assessment";
 import VerificationBadges from "@/components/ui/verification-badges";
+import NetworkValidation from "@/components/ui/network-validation";
 import IdentityCard from "@/components/ui/identity-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -137,14 +138,15 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Risk Assessment - Primary Analysis */}
-          <div className="space-y-6">
-            <RiskAssessment verifications={verifications} trustScore={user.trustScore || 0} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Network Validation - Social Proof and Third-Party Attestation */}
+          <div className="lg:col-span-2 space-y-6">
+            <NetworkValidation verifications={verifications} />
           </div>
 
-          {/* Verification Badges - Data-Driven Trust */}
+          {/* Risk Assessment and Verification Badges */}
           <div className="space-y-6">
+            <RiskAssessment verifications={verifications} trustScore={user.trustScore || 0} />
             <VerificationBadges badges={badges} verifications={verifications} />
             <IdentityCard user={user} verifications={verifications} badges={badges} />
           </div>

@@ -169,16 +169,40 @@ export class MemStorage implements IStorage {
         rarity: "rare" 
       },
       { 
-        name: "Professional Credentials", 
+        name: "Professional Network Authority", 
         description: "Employment verified, professional licenses checked, industry associations confirmed", 
         icon: "fas fa-briefcase", 
         color: "#4338ca", // Indigo - professional verification
-        requirement: "professional_verified", 
+        requirement: "professional_network", 
         category: "professional", 
         isNft: true, 
         contractAddress: null, 
         tokenId: null, 
         rarity: "epic" 
+      },
+      { 
+        name: "Document Attestation Network", 
+        description: "Documents verified by notaries, government agencies, and educational institutions", 
+        icon: "fas fa-stamp", 
+        color: "#7c2d12", // Brown - official attestation
+        requirement: "document_attestation", 
+        category: "legal", 
+        isNft: true, 
+        contractAddress: null, 
+        tokenId: null, 
+        rarity: "legendary" 
+      },
+      { 
+        name: "Social Trust Network", 
+        description: "Identity validated by verified friends, colleagues, and family members", 
+        icon: "fas fa-users-cog", 
+        color: "#059669", // Green - social validation
+        requirement: "social_network_validation", 
+        category: "social", 
+        isNft: true, 
+        contractAddress: null, 
+        tokenId: null, 
+        rarity: "rare" 
       }
     ];
 
@@ -205,25 +229,118 @@ export class MemStorage implements IStorage {
     
     this.users.set("demo-user-123", demoUser);
 
-    // Add meaningful verification methods with actual data points
-    const domainVerification: VerificationMethod = {
+    // Professional Network Verification
+    const professionalNetworkVerification: VerificationMethod = {
       id: randomUUID(),
       userId: "demo-user-123",
-      type: "domain_ownership",
+      type: "professional_network",
       status: "completed",
       data: { 
-        domain: "techcorp-industries.com",
-        spfRecord: "v=spf1 include:_spf.google.com ~all",
-        dkimValid: true,
-        dmarcPolicy: "p=reject",
-        mxRecords: ["aspmx.l.google.com", "alt1.aspmx.l.google.com"],
-        dnsVerified: true,
-        employeeDirectory: true,
-        sslCertificate: "valid",
-        registrationAge: 2847 // days since domain registration
+        linkedinProfile: "alex-rodriguez-techcorp",
+        linkedinConnections: 847,
+        mutualConnections: 23,
+        endorsements: 15,
+        recommendations: 8,
+        companyVerified: true,
+        employmentHistory: [
+          { company: "TechCorp Industries", role: "Senior Engineer", years: 3.2, verified: true },
+          { company: "StartupXYZ", role: "Lead Developer", years: 2.1, verified: true },
+          { company: "BigCorp", role: "Software Engineer", years: 1.8, verified: false }
+        ],
+        professionalLicenses: ["IEEE Member #12847", "AWS Certified Solutions Architect"],
+        industryAssociations: ["IEEE Computer Society", "ACM Professional Member"]
       },
       completedAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
       createdAt: new Date(Date.now() - 95 * 24 * 60 * 60 * 1000),
+    };
+
+    // Document Attestation Network
+    const documentAttestationVerification: VerificationMethod = {
+      id: randomUUID(),
+      userId: "demo-user-123",
+      type: "document_attestation",
+      status: "completed",
+      data: { 
+        notaryVerifications: [
+          { 
+            document: "Identity Certificate", 
+            notaryId: "NY-47281", 
+            notaryName: "Sarah Chen, Esq.", 
+            attestationDate: "2024-06-15",
+            digitalSignature: "verified",
+            sealAuthenticity: "confirmed"
+          },
+          { 
+            document: "Address Verification", 
+            notaryId: "NY-47281", 
+            notaryName: "Sarah Chen, Esq.", 
+            attestationDate: "2024-06-15",
+            digitalSignature: "verified",
+            sealAuthenticity: "confirmed"
+          }
+        ],
+        apostilleVerifications: [],
+        governmentIssuedDocs: [
+          { type: "Driver License", state: "NY", verified: true, crossReferenced: ["DMV", "SSA"] },
+          { type: "Passport", country: "USA", verified: true, crossReferenced: ["State Dept", "TSA"] }
+        ],
+        educationVerifications: [
+          { institution: "MIT", degree: "BS Computer Science", year: 2018, verified: true }
+        ]
+      },
+      completedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+      createdAt: new Date(Date.now() - 65 * 24 * 60 * 60 * 1000),
+    };
+
+    // Social Network Cross-Validation
+    const socialNetworkVerification: VerificationMethod = {
+      id: randomUUID(),
+      userId: "demo-user-123",
+      type: "social_network_validation",
+      status: "completed",
+      data: { 
+        trustedEndorsers: [
+          { 
+            name: "Dr. Jennifer Park", 
+            relationship: "Former Manager", 
+            chittyId: "47-V-MGR-PARK-A-11-3-F", 
+            trustLevel: 5,
+            endorsementStrength: 0.95,
+            yearsKnown: 4,
+            verificationMethods: ["professional", "biometric", "financial"],
+            endorsementNote: "Worked directly with Alex for 3 years. Highly trusted engineer."
+          },
+          { 
+            name: "Michael Thompson", 
+            relationship: "Business Partner", 
+            chittyId: "52-V-BIZ-THMP-B-09-8-D", 
+            trustLevel: 4,
+            endorsementStrength: 0.87,
+            yearsKnown: 5,
+            verificationMethods: ["professional", "financial", "network"],
+            endorsementNote: "Co-founded StartupXYZ together. Known personally and professionally."
+          },
+          { 
+            name: "Lisa Rodriguez", 
+            relationship: "Family Member", 
+            chittyId: "31-V-FAM-LISA-C-12-1-H", 
+            trustLevel: 3,
+            endorsementStrength: 0.78,
+            yearsKnown: 28,
+            verificationMethods: ["biometric", "address", "family"],
+            endorsementNote: "Sister. Can confirm identity and family relationships."
+          }
+        ],
+        networkMetrics: {
+          totalEndorsers: 3,
+          averageTrustLevel: 4.0,
+          networkReach: 2847, // people reachable through endorsers
+          crossValidatedClaims: 12,
+          conflictingInformation: 0
+        }
+      },
+      completedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      createdAt: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000),
     };
 
     const financialVerification: VerificationMethod = {
@@ -286,22 +403,20 @@ export class MemStorage implements IStorage {
       createdAt: new Date(Date.now() - 47 * 24 * 60 * 60 * 1000),
     };
 
-    this.verificationMethods.set(domainVerification.id, domainVerification);
-    this.verificationMethods.set(financialVerification.id, financialVerification);
-    this.verificationMethods.set(behavioralVerification.id, behavioralVerification);
-    this.verificationMethods.set(biometricVerification.id, biometricVerification);
+    this.verificationMethods.set(professionalNetworkVerification.id, professionalNetworkVerification);
+    this.verificationMethods.set(documentAttestationVerification.id, documentAttestationVerification);
+    this.verificationMethods.set(socialNetworkVerification.id, socialNetworkVerification);
 
     // Award badges based on completed verifications
-    const domainBadge = Array.from(this.badges.values()).find(b => b.requirement === "domain_ownership");
-    const financialBadge = Array.from(this.badges.values()).find(b => b.requirement === "bank_verified");
-    const behavioralBadge = Array.from(this.badges.values()).find(b => b.requirement === "behavioral_pattern");
-    const biometricBadge = Array.from(this.badges.values()).find(b => b.requirement === "biometric_unique");
+    const professionalBadge = Array.from(this.badges.values()).find(b => b.requirement === "professional_network");
+    const documentBadge = Array.from(this.badges.values()).find(b => b.requirement === "document_attestation");
+    const socialBadge = Array.from(this.badges.values()).find(b => b.requirement === "social_network_validation");
 
-    if (domainBadge) {
+    if (professionalBadge) {
       const userBadge: UserBadge = {
         id: randomUUID(),
         userId: "demo-user-123",
-        badgeId: domainBadge.id,
+        badgeId: professionalBadge.id,
         earnedAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
         mintedAt: null,
         transactionHash: null,
@@ -309,11 +424,11 @@ export class MemStorage implements IStorage {
       this.userBadges.set(userBadge.id, userBadge);
     }
 
-    if (financialBadge) {
+    if (documentBadge) {
       const userBadge: UserBadge = {
         id: randomUUID(),
         userId: "demo-user-123",
-        badgeId: financialBadge.id,
+        badgeId: documentBadge.id,
         earnedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
         mintedAt: null,
         transactionHash: null,
@@ -321,24 +436,12 @@ export class MemStorage implements IStorage {
       this.userBadges.set(userBadge.id, userBadge);
     }
 
-    if (behavioralBadge) {
+    if (socialBadge) {
       const userBadge: UserBadge = {
         id: randomUUID(),
         userId: "demo-user-123",
-        badgeId: behavioralBadge.id,
+        badgeId: socialBadge.id,
         earnedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        mintedAt: null,
-        transactionHash: null,
-      };
-      this.userBadges.set(userBadge.id, userBadge);
-    }
-
-    if (biometricBadge) {
-      const userBadge: UserBadge = {
-        id: randomUUID(),
-        userId: "demo-user-123",
-        badgeId: biometricBadge.id,
-        earnedAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
         mintedAt: null,
         transactionHash: null,
       };
