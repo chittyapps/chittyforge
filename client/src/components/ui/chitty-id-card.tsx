@@ -72,29 +72,29 @@ export default function ChittyIDCard({ user, badges, verifications }: ChittyIDCa
 
   const issuerInfo = getIssuerInfo();
 
-  // Get status colors
+  // Get status colors - clean, professional like real IDs
   const getStatusStyling = (status: string) => {
     switch (status) {
       case "AUTHENTICATED":
         return {
-          bg: "bg-emerald-50 dark:bg-emerald-950",
-          border: "border-emerald-200 dark:border-emerald-800",
-          badge: "bg-emerald-600 text-white",
-          accent: "text-emerald-600 dark:text-emerald-400"
+          bg: "bg-white dark:bg-slate-900",
+          border: "border-slate-300 dark:border-slate-600",
+          badge: "bg-slate-800 text-white",
+          accent: "text-slate-800 dark:text-slate-200"
         };
       case "VERIFIED":
         return {
-          bg: "bg-blue-50 dark:bg-blue-950",
-          border: "border-blue-200 dark:border-blue-800",
-          badge: "bg-blue-600 text-white",
-          accent: "text-blue-600 dark:text-blue-400"
+          bg: "bg-white dark:bg-slate-900",
+          border: "border-slate-300 dark:border-slate-600",
+          badge: "bg-slate-700 text-white",
+          accent: "text-slate-700 dark:text-slate-300"
         };
       default:
         return {
-          bg: "bg-gray-50 dark:bg-gray-950",
-          border: "border-gray-200 dark:border-gray-800",
-          badge: "bg-gray-600 text-white",
-          accent: "text-gray-600 dark:text-gray-400"
+          bg: "bg-white dark:bg-slate-900",
+          border: "border-slate-300 dark:border-slate-600",
+          badge: "bg-slate-600 text-white",
+          accent: "text-slate-600 dark:text-slate-400"
         };
     }
   };
@@ -153,7 +153,7 @@ export default function ChittyIDCard({ user, badges, verifications }: ChittyIDCa
             </div>
 
             {/* Verification Status Grid */}
-            <div className="grid grid-cols-2 gap-3 mb-6 p-3 bg-white dark:bg-slate-900 rounded border">
+            <div className="grid grid-cols-2 gap-3 mb-6 p-3 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">
               <div className="text-center">
                 <div className="text-lg font-bold font-mono text-slate-900 dark:text-slate-100">
                   {Math.round((user.trustScore || 0) / 10)}%
@@ -181,7 +181,7 @@ export default function ChittyIDCard({ user, badges, verifications }: ChittyIDCa
                 {/* Government */}
                 <div className={`text-center p-2 rounded border ${
                   verifications.some(v => v.type === "document_attestation" && v.status === "completed")
-                    ? 'bg-emerald-100 border-emerald-300 dark:bg-emerald-900 dark:border-emerald-700'
+                    ? 'bg-slate-200 border-slate-400 dark:bg-slate-700 dark:border-slate-500'
                     : 'bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600'
                 }`}>
                   <div className="text-sm mb-1">🏛️</div>
@@ -191,7 +191,7 @@ export default function ChittyIDCard({ user, badges, verifications }: ChittyIDCa
                 {/* Professional */}
                 <div className={`text-center p-2 rounded border ${
                   verifications.some(v => v.type === "professional_network" && v.status === "completed")
-                    ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700'
+                    ? 'bg-slate-200 border-slate-400 dark:bg-slate-700 dark:border-slate-500'
                     : 'bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600'
                 }`}>
                   <div className="text-sm mb-1">🏢</div>
@@ -201,7 +201,7 @@ export default function ChittyIDCard({ user, badges, verifications }: ChittyIDCa
                 {/* Social */}
                 <div className={`text-center p-2 rounded border ${
                   verifications.some(v => v.type === "social_network_validation" && v.status === "completed")
-                    ? 'bg-purple-100 border-purple-300 dark:bg-purple-900 dark:border-purple-700'
+                    ? 'bg-slate-200 border-slate-400 dark:bg-slate-700 dark:border-slate-500'
                     : 'bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600'
                 }`}>
                   <div className="text-sm mb-1">👥</div>
