@@ -1,12 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
-import ProfessionalCredentials from "@/components/ui/professional-credentials";
-import VerificationStatusBoard from "@/components/ui/verification-status-board";
-import NetworkValidation from "@/components/ui/network-validation";
+import ChittyForgeCard from "@/components/ui/chitty-forge-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 // Mock user ID for demo - in a real app this would come from auth context
 const DEMO_USER_ID = "demo-user-123";
@@ -138,35 +136,10 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* Professional Identity Verification */}
-        <Tabs defaultValue="status" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="status" className="flex items-center space-x-2">
-              <i className="fas fa-clipboard-check"></i>
-              <span>Verification Status</span>
-            </TabsTrigger>
-            <TabsTrigger value="credentials" className="flex items-center space-x-2">
-              <i className="fas fa-certificate"></i>
-              <span>Professional Credentials</span>
-            </TabsTrigger>
-            <TabsTrigger value="network" className="flex items-center space-x-2">
-              <i className="fas fa-users-cog"></i>
-              <span>Network Validation</span>
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="status" className="mt-6">
-            <VerificationStatusBoard user={user} badges={badges} verifications={verifications} />
-          </TabsContent>
-          
-          <TabsContent value="credentials" className="mt-6">
-            <ProfessionalCredentials user={user} badges={badges} verifications={verifications} />
-          </TabsContent>
-          
-          <TabsContent value="network" className="mt-6">
-            <NetworkValidation verifications={verifications} />
-          </TabsContent>
-        </Tabs>
+        {/* ChittyForge Mobile Card */}
+        <section className="flex justify-center py-8">
+          <ChittyForgeCard user={user} badges={badges} verifications={verifications} />
+        </section>
       </main>
 
 
