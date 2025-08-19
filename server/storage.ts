@@ -164,6 +164,8 @@ export class MemStorage implements IStorage {
         userId: "demo-user-123",
         badgeId: emailBadge.id,
         earnedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+        mintedAt: null,
+        transactionHash: null,
       };
       this.userBadges.set(userBadge.id, userBadge);
     }
@@ -174,6 +176,8 @@ export class MemStorage implements IStorage {
         userId: "demo-user-123",
         badgeId: phoneBadge.id,
         earnedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        mintedAt: null,
+        transactionHash: null,
       };
       this.userBadges.set(userBadge.id, userBadge);
     }
@@ -184,6 +188,8 @@ export class MemStorage implements IStorage {
         userId: "demo-user-123",
         badgeId: earlyAdopterBadge.id,
         earnedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        mintedAt: null,
+        transactionHash: null,
       };
       this.userBadges.set(userBadge.id, userBadge);
     }
@@ -268,9 +274,13 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const chittyId = this.generateChittyId();
     const user: User = { 
-      ...insertUser, 
       id, 
+      username: insertUser.username,
+      password: insertUser.password,
       chittyId,
+      email: insertUser.email || null,
+      phone: insertUser.phone || null,
+      fullName: insertUser.fullName || null,
       avatar: null,
       trustLevel: 1,
       trustScore: 100,
@@ -312,8 +322,10 @@ export class MemStorage implements IStorage {
   async createVerificationMethod(verification: InsertVerification): Promise<VerificationMethod> {
     const id = randomUUID();
     const method: VerificationMethod = {
-      ...verification,
       id,
+      userId: verification.userId,
+      type: verification.type,
+      data: verification.data || null,
       status: "pending",
       completedAt: null,
       createdAt: new Date(),
@@ -413,6 +425,8 @@ export class MemStorage implements IStorage {
       userId,
       badgeId,
       earnedAt: new Date(),
+      mintedAt: null,
+      transactionHash: null,
     };
     this.userBadges.set(id, userBadge);
 

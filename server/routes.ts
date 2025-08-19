@@ -275,8 +275,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const endorsementData = createEndorsementSchema.parse(req.body);
       
       const endorsement = await storage.createEndorsement({
-        ...endorsementData,
         endorserId,
+        endorsedId: endorsementData.endorsedId,
+        endorsementType: endorsementData.endorsementType,
+        message: endorsementData.message || null,
+        isPublic: endorsementData.isPublic,
         trustWeight: 1,
       });
 
