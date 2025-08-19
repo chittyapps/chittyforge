@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
-import ChittyForgeCard from "@/components/ui/chitty-forge-card";
+import ChittyIDCard from "@/components/ui/chitty-id-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -136,9 +136,9 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* ChittyForge Mobile Card */}
+        {/* ChittyID Card */}
         <section className="flex justify-center py-8">
-          <ChittyForgeCard user={user} badges={badges} verifications={verifications} />
+          <ChittyIDCard user={user} badges={badges} verifications={verifications} />
         </section>
       </main>
 
