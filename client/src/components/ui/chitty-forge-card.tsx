@@ -39,48 +39,58 @@ export default function ChittyForgeCard({ user, badges, verifications }: ChittyF
 
   const forgeStatus = calculateForgeCompletion();
 
-  // Get forge level display
+  // Get forge level display with full blacksmith terminology
   const getForgeDisplay = (level: string) => {
     switch (level) {
       case "MASTER_FORGED": 
         return { 
           title: "Master Forged", 
-          subtitle: "Identity fully tempered and verified",
+          subtitle: "Tempered in the fires of verification",
           icon: "🔥", 
           color: "from-yellow-400 via-red-500 to-pink-500",
-          bgColor: "bg-gradient-to-br from-yellow-50 to-red-50 dark:from-yellow-900/20 dark:to-red-900/20"
+          bgColor: "bg-gradient-to-br from-yellow-50 to-red-50 dark:from-yellow-900/20 dark:to-red-900/20",
+          temp: "White Hot",
+          process: "Quenched & Tempered"
         };
       case "WELL_FORGED": 
         return { 
           title: "Well Forged", 
-          subtitle: "Identity hardened with strong verification",
+          subtitle: "Hardened through the anvil of trust",
           icon: "⚡", 
           color: "from-blue-400 via-purple-500 to-indigo-600",
-          bgColor: "bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20"
+          bgColor: "bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20",
+          temp: "Orange Heat",
+          process: "Shaped & Hardened"
         };
       case "HALF_FORGED": 
         return { 
           title: "Half Forged", 
-          subtitle: "Identity taking shape through verification",
+          subtitle: "Taking shape on the anvil of verification",
           icon: "🔨", 
           color: "from-orange-400 to-amber-500",
-          bgColor: "bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20"
+          bgColor: "bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20",
+          temp: "Red Heat",
+          process: "Hammering"
         };
       case "ROUGH_FORGED": 
         return { 
           title: "Rough Forged", 
-          subtitle: "Initial identity framework established",
+          subtitle: "First strikes upon the anvil",
           icon: "⚒️", 
           color: "from-gray-400 to-slate-500",
-          bgColor: "bg-gradient-to-br from-gray-50 to-slate-50 dark:from-gray-900/20 dark:to-slate-900/20"
+          bgColor: "bg-gradient-to-br from-gray-50 to-slate-50 dark:from-gray-900/20 dark:to-slate-900/20",
+          temp: "Cherry Red",
+          process: "Initial Forming"
         };
       default: 
         return { 
-          title: "Raw Material", 
-          subtitle: "Identity awaiting the forge",
+          title: "Raw Steel", 
+          subtitle: "Awaiting the blacksmith's flame",
           icon: "🪨", 
           color: "from-stone-400 to-gray-500",
-          bgColor: "bg-gradient-to-br from-stone-50 to-gray-50 dark:from-stone-900/20 dark:to-gray-900/20"
+          bgColor: "bg-gradient-to-br from-stone-50 to-gray-50 dark:from-stone-900/20 dark:to-gray-900/20",
+          temp: "Cold Iron",
+          process: "Unworked"
         };
     }
   };
@@ -122,13 +132,18 @@ export default function ChittyForgeCard({ user, badges, verifications }: ChittyF
           
           {/* ChittyForge Header */}
           <div className="text-center mb-6">
-            <div className="flex items-center justify-center mb-2">
+            <div className="flex items-center justify-center mb-2 space-x-2">
+              <span className="text-lg">🔥</span>
               <span className="text-2xl font-bold bg-gradient-to-r from-slate-600 to-slate-800 dark:from-slate-300 dark:to-slate-100 bg-clip-text text-transparent">
                 ChittyForge
               </span>
+              <span className="text-lg">🔨</span>
             </div>
-            <p className="text-xs text-muted-foreground font-medium tracking-wide uppercase">
-              FORGE YOUR ID
+            <p className="text-xs text-muted-foreground font-medium tracking-wide uppercase border-b border-dotted border-slate-300 dark:border-slate-600 pb-1">
+              FORGE YOUR IDENTITY
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 italic">
+              "From raw steel to masterwork"
             </p>
           </div>
 
@@ -147,115 +162,150 @@ export default function ChittyForgeCard({ user, badges, verifications }: ChittyF
 
           {/* Forge Status */}
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-2">
-                <span className="text-lg">{forgeDisplay.icon}</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-3">
+                <div className="relative">
+                  <span className="text-2xl">{forgeDisplay.icon}</span>
+                  {forgeStatus.progress > 0 && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  )}
+                </div>
                 <div>
-                  <h3 className="text-sm font-semibold">{forgeDisplay.title}</h3>
+                  <h3 className="text-sm font-bold">{forgeDisplay.title}</h3>
                   <p className="text-xs text-muted-foreground">{forgeDisplay.subtitle}</p>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <Badge variant="outline" className="text-xs">
+                      {forgeDisplay.temp}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">•</span>
+                    <span className="text-xs text-muted-foreground italic">{forgeDisplay.process}</span>
+                  </div>
                 </div>
               </div>
-              <Badge 
-                variant="outline" 
-                className="text-xs font-mono"
-              >
-                {forgeStatus.progress}%
-              </Badge>
             </div>
             
-            {/* Forge Progress Bar */}
-            <div className="space-y-2">
+            {/* Forge Heat Indicator */}
+            <div className="mb-3 p-3 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-lg border">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium">FORGE HEAT</span>
+                <Badge variant="outline" className="text-xs font-mono">
+                  {forgeStatus.progress}% Complete
+                </Badge>
+              </div>
               <Progress 
                 value={forgeStatus.progress} 
-                className="h-3"
+                className="h-2"
                 data-testid="progress-forge-completion"
               />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Raw Material</span>
-                <span>Master Forged</span>
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>🪨 Cold Iron</span>
+                <span>🔥 Master Work</span>
               </div>
             </div>
           </div>
 
-          {/* Verification Highlights */}
+          {/* Smithing Progress - Verification Highlights */}
           {verificationHighlights.length > 0 && (
             <div className="mb-6">
-              <h4 className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">
-                Identity Elements
-              </h4>
-              <div className="space-y-2">
-                {verificationHighlights.map((highlight, index) => (
-                  <div 
-                    key={index}
-                    className="flex items-center space-x-2 text-sm"
-                  >
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-slate-700 dark:text-slate-300">{highlight}</span>
-                  </div>
-                ))}
+              <div className="flex items-center space-x-2 mb-3">
+                <span className="text-sm">⚒️</span>
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Smithing Progress
+                </h4>
+              </div>
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded p-3">
+                <div className="space-y-2">
+                  {verificationHighlights.map((highlight, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center space-x-3 text-sm"
+                    >
+                      <span className="text-amber-600">🔨</span>
+                      <span className="text-amber-800 dark:text-amber-200 font-medium">{highlight}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
-          {/* Trust Metrics */}
-          <div className="grid grid-cols-2 gap-4 mb-6 p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-600">
+          {/* Blacksmith Metrics */}
+          <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gradient-to-br from-slate-100 via-slate-50 to-stone-100 dark:from-slate-800 dark:via-slate-700 dark:to-stone-800 rounded-lg border-2 border-slate-300 dark:border-slate-600">
             <div className="text-center">
-              <div className="text-lg font-bold font-mono text-slate-700 dark:text-slate-300">
-                {user.trustLevel || 1}
+              <div className="flex items-center justify-center mb-1">
+                <span className="text-xs mr-1">🏆</span>
+                <div className="text-lg font-bold font-mono text-slate-700 dark:text-slate-300">
+                  {user.trustLevel || 1}
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground">Forge Level</div>
+              <div className="text-xs text-muted-foreground font-medium">Smith Level</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold font-mono text-slate-700 dark:text-slate-300">
-                {Math.round((user.trustScore || 0) / 10)}%
+              <div className="flex items-center justify-center mb-1">
+                <span className="text-xs mr-1">⚡</span>
+                <div className="text-lg font-bold font-mono text-slate-700 dark:text-slate-300">
+                  {Math.round((user.trustScore || 0) / 10)}%
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground">Trust Score</div>
+              <div className="text-xs text-muted-foreground font-medium">Steel Purity</div>
             </div>
           </div>
 
-          {/* Action Button */}
-          <div className="space-y-2">
+          {/* Blacksmith Action */}
+          <div className="space-y-3">
             {forgeStatus.progress < 100 ? (
               <Button 
-                className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white"
+                className="w-full bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 hover:from-red-700 hover:via-orange-700 hover:to-yellow-700 text-white font-bold shadow-lg border border-red-700"
                 data-testid="button-continue-forging"
               >
-                <i className="fas fa-hammer mr-2"></i>
-                Continue Forging
+                <span className="mr-2">🔥</span>
+                Return to the Forge
+                <span className="ml-2">⚒️</span>
               </Button>
             ) : (
               <Button 
-                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white"
+                className="w-full bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold shadow-lg border border-emerald-700"
                 data-testid="button-share-forged-id"
               >
-                <i className="fas fa-share-alt mr-2"></i>
-                Share Forged ID
+                <span className="mr-2">✨</span>
+                Display Masterwork
+                <span className="ml-2">🏆</span>
               </Button>
             )}
             
             <Button 
               variant="outline" 
               size="sm" 
-              className="w-full text-xs"
+              className="w-full text-xs border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
               data-testid="button-view-forge-details"
             >
-              View Forge Details
+              <span className="mr-1">📜</span>
+              Forge Journal
             </Button>
           </div>
 
         </CardContent>
       </Card>
 
-      {/* Next Forging Step */}
+      {/* Next Smithing Task */}
       {forgeStatus.progress < 100 && (
-        <div className="mt-4 text-center">
-          <div className="text-xs text-muted-foreground mb-2">
-            Next in the forge:
+        <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg text-center">
+          <div className="flex items-center justify-center space-x-2 mb-2">
+            <span className="text-orange-500">🔥</span>
+            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+              Next at the Anvil
+            </span>
+            <span className="text-orange-500">🔨</span>
           </div>
-          <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
-            {forgeStatus.completedCount === 0 ? "Government Document Verification" :
-             forgeStatus.completedCount === 1 ? "Professional Network Validation" :
-             "Social Trust Network Building"}
+          <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            {forgeStatus.completedCount === 0 ? "Heat Government Documents" :
+             forgeStatus.completedCount === 1 ? "Hammer Professional Networks" :
+             "Temper Social Trust Bonds"}
+          </div>
+          <div className="text-xs text-muted-foreground mt-1 italic">
+            {forgeStatus.completedCount === 0 ? "Bring official papers to white heat" :
+             forgeStatus.completedCount === 1 ? "Shape connections on the anvil" :
+             "Quench bonds in trust"}
           </div>
         </div>
       )}
