@@ -1,7 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, verifyChittyIdSchema, updateVerificationSchema, createShareSchema, insertVerificationSchema } from "@shared/schema";
+import { 
+  insertUserSchema, verifyChittyIdSchema, updateVerificationSchema, 
+  createShareSchema, insertVerificationSchema, blockchainVerifySchema,
+  createEndorsementSchema, biometricVerifySchema, mintBadgeNftSchema 
+} from "@shared/schema";
 // Temporary simple hash function - in production use proper bcrypt
 const simpleHash = (password: string): string => {
   return Buffer.from(password).toString('base64');
@@ -226,6 +230,144 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: "Failed to get stats", error });
+    }
+  });
+
+  // Blockchain verification routes
+  app.post("/api/user/:id/verify-blockchain", async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { walletAddress, chainId, signature } = blockchainVerifySchema.parse(req.body);
+      
+      const isValid = await storage.verifyBlockchainAddress(walletAddress, signature);
+      if (!isValid) {
+        return res.status(400).json({ message: "Invalid blockchain signature" });
+      }
+
+      const verification = await storage.createBlockchainVerification({
+        userId,
+        walletAddress,
+        chainId,
+        transactionHash: null,
+        blockNumber: null,
+        verified: true,
+      });
+
+      res.json(verification);
+    } catch (error) {
+      res.status(400).json({ message: "Blockchain verification failed", error });
+    }
+  });
+
+  app.get("/api/user/:id/blockchain-verifications", async (req, res) => {
+    try {
+      const verifications = await storage.getBlockchainVerifications(req.params.id);
+      res.json(verifications);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get blockchain verifications", error });
+    }
+  });
+
+  // Social endorsement routes
+  app.post("/api/user/:id/endorse", async (req, res) => {
+    try {
+      const endorserId = req.params.id;
+      const endorsementData = createEndorsementSchema.parse(req.body);
+      
+      const endorsement = await storage.createEndorsement({
+        ...endorsementData,
+        endorserId,
+        trustWeight: 1,
+      });
+
+      res.json(endorsement);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create endorsement", error });
+    }
+  });
+
+  app.get("/api/user/:id/endorsements", async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const [receivedEndorsements, givenEndorsements] = await Promise.all([
+        storage.getEndorsementsFor(userId),
+        storage.getEndorsementsBy(userId),
+      ]);
+
+      res.json({
+        received: receivedEndorsements,
+        given: givenEndorsements,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get endorsements", error });
+    }
+  });
+
+  // Biometric verification routes
+  app.post("/api/user/:id/verify-biometric", async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { biometricType, templateData, provider } = biometricVerifySchema.parse(req.body);
+      
+      // Check if this is a new registration or verification
+      const existingBiometric = await storage.getBiometricData(userId);
+      const isExisting = existingBiometric.some(b => b.biometricType === biometricType);
+      
+      if (isExisting) {
+        // Verify against existing biometric
+        const isValid = await storage.verifyBiometric(userId, templateData, biometricType);
+        if (!isValid) {
+          return res.status(400).json({ message: "Biometric verification failed" });
+        }
+        res.json({ verified: true, message: "Biometric verified successfully" });
+      } else {
+        // Register new biometric
+        const templateHash = Buffer.from(templateData).toString('base64'); // Simple hash for demo
+        const biometric = await storage.createBiometricRecord({
+          userId,
+          biometricType,
+          templateHash,
+          provider: provider || "ChittyID",
+          confidenceScore: 95,
+          verified: true,
+          lastVerified: new Date(),
+        });
+        res.json(biometric);
+      }
+    } catch (error) {
+      res.status(400).json({ message: "Biometric processing failed", error });
+    }
+  });
+
+  app.get("/api/user/:id/biometric-data", async (req, res) => {
+    try {
+      const biometricData = await storage.getBiometricData(req.params.id);
+      res.json(biometricData);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get biometric data", error });
+    }
+  });
+
+  // NFT badge minting route
+  app.post("/api/badges/:badgeId/mint", async (req, res) => {
+    try {
+      const { badgeId } = req.params;
+      const { walletAddress } = mintBadgeNftSchema.parse(req.body);
+      
+      // Simulate NFT minting process
+      const transactionHash = `0x${Array.from({ length: 64 }, () => 
+        Math.floor(Math.random() * 16).toString(16)
+      ).join('')}`;
+      
+      res.json({
+        success: true,
+        badgeId,
+        walletAddress,
+        transactionHash,
+        message: "NFT badge minted successfully",
+      });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to mint NFT badge", error });
     }
   });
 

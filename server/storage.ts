@@ -1,4 +1,9 @@
-import { type User, type InsertUser, type VerificationMethod, type InsertVerification, type Badge, type UserBadge, type ActivityLog, type InsertActivityLog, type IdentityShare } from "@shared/schema";
+import { 
+  type User, type InsertUser, type VerificationMethod, type InsertVerification, 
+  type Badge, type UserBadge, type ActivityLog, type InsertActivityLog, 
+  type IdentityShare, type BlockchainVerification, type SocialEndorsement, 
+  type BiometricData 
+} from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -33,6 +38,21 @@ export interface IStorage {
     verificationsToday: number;
     trustTransactions: number;
   }>;
+
+  // Blockchain Verifications
+  createBlockchainVerification(data: Omit<BlockchainVerification, 'id' | 'createdAt'>): Promise<BlockchainVerification>;
+  getBlockchainVerifications(userId: string): Promise<BlockchainVerification[]>;
+  verifyBlockchainAddress(walletAddress: string, signature: string): Promise<boolean>;
+
+  // Social Endorsements
+  createEndorsement(data: Omit<SocialEndorsement, 'id' | 'createdAt'>): Promise<SocialEndorsement>;
+  getEndorsementsFor(userId: string): Promise<SocialEndorsement[]>;
+  getEndorsementsBy(userId: string): Promise<SocialEndorsement[]>;
+
+  // Biometric Data
+  createBiometricRecord(data: Omit<BiometricData, 'id' | 'createdAt'>): Promise<BiometricData>;
+  getBiometricData(userId: string): Promise<BiometricData[]>;
+  verifyBiometric(userId: string, templateData: string, type: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -42,6 +62,9 @@ export class MemStorage implements IStorage {
   private userBadges: Map<string, UserBadge>;
   private activityLogs: Map<string, ActivityLog>;
   private identityShares: Map<string, IdentityShare>;
+  private blockchainVerifications: Map<string, BlockchainVerification>;
+  private socialEndorsements: Map<string, SocialEndorsement>;
+  private biometricData: Map<string, BiometricData>;
 
   constructor() {
     this.users = new Map();
@@ -50,6 +73,9 @@ export class MemStorage implements IStorage {
     this.userBadges = new Map();
     this.activityLogs = new Map();
     this.identityShares = new Map();
+    this.blockchainVerifications = new Map();
+    this.socialEndorsements = new Map();
+    this.biometricData = new Map();
     
     this.initializeBadges();
     this.initializeDemoUser();
@@ -57,14 +83,16 @@ export class MemStorage implements IStorage {
 
   private initializeBadges() {
     const defaultBadges: Omit<Badge, 'id'>[] = [
-      { name: "Email Pro", description: "Email verification completed", icon: "fas fa-envelope", color: "mint-green", requirement: "email_verified", category: "verification" },
-      { name: "Phone Master", description: "Phone verification completed", icon: "fas fa-phone", color: "electric-blue", requirement: "phone_verified", category: "verification" },
-      { name: "Profile Complete", description: "Complete your profile", icon: "fas fa-user", color: "purple", requirement: "profile_complete", category: "profile" },
-      { name: "Early Adopter", description: "One of the first users", icon: "fas fa-clock", color: "yellow", requirement: "early_adopter", category: "special" },
-      { name: "Social Sharer", description: "Share your identity", icon: "fas fa-share", color: "pink", requirement: "social_share", category: "social" },
-      { name: "Trust Builder", description: "Build trust in the network", icon: "fas fa-shield-alt", color: "green", requirement: "trust_builder", category: "trust" },
-      { name: "ID Verified", description: "Government ID verified", icon: "fas fa-id-card", color: "orange", requirement: "government_id_verified", category: "verification" },
-      { name: "Biometric", description: "Biometric verification completed", icon: "fas fa-fingerprint", color: "red", requirement: "biometric_verified", category: "verification" },
+      { name: "Email Pro", description: "Email verification completed", icon: "fas fa-envelope", color: "mint-green", requirement: "email_verified", category: "verification", isNft: false, contractAddress: null, tokenId: null, rarity: "common" },
+      { name: "Phone Master", description: "Phone verification completed", icon: "fas fa-phone", color: "electric-blue", requirement: "phone_verified", category: "verification", isNft: false, contractAddress: null, tokenId: null, rarity: "common" },
+      { name: "Profile Complete", description: "Complete your profile", icon: "fas fa-user", color: "purple", requirement: "profile_complete", category: "profile", isNft: false, contractAddress: null, tokenId: null, rarity: "common" },
+      { name: "Early Adopter", description: "One of the first users", icon: "fas fa-clock", color: "yellow", requirement: "early_adopter", category: "special", isNft: true, contractAddress: null, tokenId: null, rarity: "rare" },
+      { name: "Social Sharer", description: "Share your identity", icon: "fas fa-share", color: "pink", requirement: "social_share", category: "social", isNft: false, contractAddress: null, tokenId: null, rarity: "common" },
+      { name: "Trust Builder", description: "Build trust in the network", icon: "fas fa-shield-alt", color: "green", requirement: "trust_builder", category: "trust", isNft: true, contractAddress: null, tokenId: null, rarity: "epic" },
+      { name: "ID Verified", description: "Government ID verified", icon: "fas fa-id-card", color: "orange", requirement: "government_id_verified", category: "verification", isNft: false, contractAddress: null, tokenId: null, rarity: "rare" },
+      { name: "Biometric Master", description: "Biometric verification completed", icon: "fas fa-fingerprint", color: "red", requirement: "biometric_verified", category: "verification", isNft: true, contractAddress: null, tokenId: null, rarity: "epic" },
+      { name: "Blockchain Pioneer", description: "On-chain identity verified", icon: "fas fa-link", color: "purple", requirement: "blockchain_verified", category: "verification", isNft: true, contractAddress: null, tokenId: null, rarity: "legendary" },
+      { name: "Community Endorsed", description: "Received 5+ peer endorsements", icon: "fas fa-users", color: "blue", requirement: "social_endorsed", category: "social", isNft: true, contractAddress: null, tokenId: null, rarity: "rare" },
     ];
 
     defaultBadges.forEach(badge => {
@@ -474,6 +502,142 @@ export class MemStorage implements IStorage {
       verificationsToday: verificationsToday + 15800, // Add to simulated base
       trustTransactions: 892000, // Simulated
     };
+  }
+
+  // Blockchain Verification Methods
+  async createBlockchainVerification(data: Omit<BlockchainVerification, 'id' | 'createdAt'>): Promise<BlockchainVerification> {
+    const id = randomUUID();
+    const verification: BlockchainVerification = {
+      ...data,
+      id,
+      createdAt: new Date(),
+    };
+    this.blockchainVerifications.set(id, verification);
+
+    // Create verification method record
+    await this.createVerificationMethod({
+      userId: data.userId,
+      type: "blockchain",
+      data: { walletAddress: data.walletAddress, chainId: data.chainId },
+    });
+
+    // Award blockchain badge if verified
+    if (data.verified) {
+      const blockchainBadge = Array.from(this.badges.values()).find(b => b.requirement === "blockchain_verified");
+      if (blockchainBadge) {
+        await this.awardBadge(data.userId, blockchainBadge.id);
+      }
+    }
+
+    return verification;
+  }
+
+  async getBlockchainVerifications(userId: string): Promise<BlockchainVerification[]> {
+    return Array.from(this.blockchainVerifications.values())
+      .filter(bv => bv.userId === userId)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async verifyBlockchainAddress(walletAddress: string, signature: string): Promise<boolean> {
+    // Simulate blockchain signature verification
+    // In production, this would verify the signature against the wallet address
+    return signature.length > 0 && walletAddress.startsWith("0x");
+  }
+
+  // Social Endorsement Methods
+  async createEndorsement(data: Omit<SocialEndorsement, 'id' | 'createdAt'>): Promise<SocialEndorsement> {
+    const id = randomUUID();
+    const endorsement: SocialEndorsement = {
+      ...data,
+      id,
+      createdAt: new Date(),
+    };
+    this.socialEndorsements.set(id, endorsement);
+
+    // Update trust score for endorsed user
+    const endorsedUser = await this.getUser(data.endorsedId);
+    if (endorsedUser) {
+      const newTrustScore = (endorsedUser.trustScore || 0) + (data.trustWeight || 1) * 10;
+      await this.updateUser(data.endorsedId, { trustScore: newTrustScore });
+    }
+
+    // Check if user qualifies for community endorsed badge
+    const endorsements = await this.getEndorsementsFor(data.endorsedId);
+    if (endorsements.length >= 5) {
+      const socialBadge = Array.from(this.badges.values()).find(b => b.requirement === "social_endorsed");
+      if (socialBadge) {
+        await this.awardBadge(data.endorsedId, socialBadge.id);
+      }
+    }
+
+    await this.createActivityLog({
+      userId: data.endorsedId,
+      action: "endorsement_received",
+      description: `Received ${data.endorsementType} endorsement`,
+      metadata: { endorserId: data.endorserId, type: data.endorsementType },
+    });
+
+    return endorsement;
+  }
+
+  async getEndorsementsFor(userId: string): Promise<SocialEndorsement[]> {
+    return Array.from(this.socialEndorsements.values())
+      .filter(se => se.endorsedId === userId)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async getEndorsementsBy(userId: string): Promise<SocialEndorsement[]> {
+    return Array.from(this.socialEndorsements.values())
+      .filter(se => se.endorserId === userId)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  // Biometric Methods
+  async createBiometricRecord(data: Omit<BiometricData, 'id' | 'createdAt'>): Promise<BiometricData> {
+    const id = randomUUID();
+    const biometric: BiometricData = {
+      ...data,
+      id,
+      createdAt: new Date(),
+    };
+    this.biometricData.set(id, biometric);
+
+    // Create verification method record
+    await this.createVerificationMethod({
+      userId: data.userId,
+      type: "biometric",
+      data: { type: data.biometricType, provider: data.provider },
+    });
+
+    // Award biometric badge if verified
+    if (data.verified) {
+      const biometricBadge = Array.from(this.badges.values()).find(b => b.requirement === "biometric_verified");
+      if (biometricBadge) {
+        await this.awardBadge(data.userId, biometricBadge.id);
+      }
+    }
+
+    return biometric;
+  }
+
+  async getBiometricData(userId: string): Promise<BiometricData[]> {
+    return Array.from(this.biometricData.values())
+      .filter(bd => bd.userId === userId)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async verifyBiometric(userId: string, templateData: string, type: string): Promise<boolean> {
+    // Simulate biometric verification
+    // In production, this would compare against stored biometric templates
+    const existingBiometric = Array.from(this.biometricData.values())
+      .find(bd => bd.userId === userId && bd.biometricType === type);
+    
+    if (existingBiometric) {
+      // Simulate template matching
+      return templateData.length > 0;
+    }
+    
+    return false;
   }
 }
 

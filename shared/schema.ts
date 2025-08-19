@@ -20,7 +20,7 @@ export const users = pgTable("users", {
 export const verificationMethods = pgTable("verification_methods", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: text("user_id").references(() => users.id).notNull(),
-  type: text("type").notNull(), // email, phone, government_id, biometric
+  type: text("type").notNull(), // email, phone, government_id, biometric, blockchain, social
   status: text("status").notNull().default("pending"), // pending, in_review, completed, failed
   data: jsonb("data"), // verification specific data
   completedAt: timestamp("completed_at"),
@@ -35,6 +35,10 @@ export const badges = pgTable("badges", {
   color: text("color").notNull(),
   requirement: text("requirement").notNull(),
   category: text("category").notNull(),
+  isNft: boolean("is_nft").default(false),
+  contractAddress: text("contract_address"),
+  tokenId: text("token_id"),
+  rarity: text("rarity"), // common, rare, epic, legendary
 });
 
 export const userBadges = pgTable("user_badges", {
@@ -42,6 +46,8 @@ export const userBadges = pgTable("user_badges", {
   userId: text("user_id").references(() => users.id).notNull(),
   badgeId: text("badge_id").references(() => badges.id).notNull(),
   earnedAt: timestamp("earned_at").defaultNow(),
+  mintedAt: timestamp("minted_at"),
+  transactionHash: text("transaction_hash"),
 });
 
 export const activityLogs = pgTable("activity_logs", {
@@ -59,6 +65,43 @@ export const identityShares = pgTable("identity_shares", {
   shareToken: text("share_token").notNull().unique(),
   isPublic: boolean("is_public").default(false),
   expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Blockchain verification records
+export const blockchainVerifications = pgTable("blockchain_verifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: text("user_id").references(() => users.id).notNull(),
+  walletAddress: text("wallet_address").notNull(),
+  chainId: integer("chain_id").notNull(),
+  transactionHash: text("transaction_hash"),
+  blockNumber: integer("block_number"),
+  verified: boolean("verified").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Social endorsements for peer verification
+export const socialEndorsements = pgTable("social_endorsements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  endorserId: text("endorser_id").references(() => users.id).notNull(),
+  endorsedId: text("endorsed_id").references(() => users.id).notNull(),
+  endorsementType: text("endorsement_type").notNull(), // professional, personal, skill
+  message: text("message"),
+  trustWeight: integer("trust_weight").default(1),
+  isPublic: boolean("is_public").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Biometric verification data
+export const biometricData = pgTable("biometric_data", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: text("user_id").references(() => users.id).notNull(),
+  biometricType: text("biometric_type").notNull(), // face, fingerprint, voice
+  templateHash: text("template_hash").notNull(), // Hashed biometric template
+  provider: text("provider"), // Third-party verification provider
+  confidenceScore: integer("confidence_score"),
+  verified: boolean("verified").default(false),
+  lastVerified: timestamp("last_verified"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -98,6 +141,9 @@ export type UserBadge = typeof userBadges.$inferSelect;
 export type ActivityLog = typeof activityLogs.$inferSelect;
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
 export type IdentityShare = typeof identityShares.$inferSelect;
+export type BlockchainVerification = typeof blockchainVerifications.$inferSelect;
+export type SocialEndorsement = typeof socialEndorsements.$inferSelect;
+export type BiometricData = typeof biometricData.$inferSelect;
 
 // Additional schemas for API endpoints
 export const verifyChittyIdSchema = z.object({
@@ -113,4 +159,32 @@ export const updateVerificationSchema = z.object({
 export const createShareSchema = z.object({
   isPublic: z.boolean().default(false),
   expiresInDays: z.number().optional(),
+});
+
+// Blockchain verification schemas
+export const blockchainVerifySchema = z.object({
+  walletAddress: z.string().min(1, "Wallet address is required"),
+  chainId: z.number().min(1, "Chain ID is required"),
+  signature: z.string().min(1, "Signature is required"),
+});
+
+// Social endorsement schemas
+export const createEndorsementSchema = z.object({
+  endorsedId: z.string().min(1, "Endorsed user ID is required"),
+  endorsementType: z.enum(["professional", "personal", "skill"]),
+  message: z.string().optional(),
+  isPublic: z.boolean().default(true),
+});
+
+// Biometric verification schemas
+export const biometricVerifySchema = z.object({
+  biometricType: z.enum(["face", "fingerprint", "voice"]),
+  templateData: z.string().min(1, "Template data is required"),
+  provider: z.string().optional(),
+});
+
+// NFT badge minting schema
+export const mintBadgeNftSchema = z.object({
+  badgeId: z.string().min(1, "Badge ID is required"),
+  walletAddress: z.string().min(1, "Wallet address is required"),
 });
