@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
-import RiskAssessment from "@/components/ui/risk-assessment";
-import VerificationBadges from "@/components/ui/verification-badges";
+import ChittyIDGrowthCenter from "@/components/ui/chitty-id-growth-center";
+import AchievementSystem from "@/components/ui/achievement-system";
 import NetworkValidation from "@/components/ui/network-validation";
-import IdentityCard from "@/components/ui/identity-card";
+import VerificationBadges from "@/components/ui/verification-badges";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Mock user ID for demo - in a real app this would come from auth context
 const DEMO_USER_ID = "demo-user-123";
@@ -84,7 +85,7 @@ export default function Dashboard() {
     );
   }
 
-  const { user, verifications, badges, activities, networkStats } = data || {};
+  const { user, verifications = [], badges = [], activities = [], networkStats = {} } = data || {};
 
   return (
     <div className="min-h-screen bg-dark-bg-950">
@@ -138,19 +139,40 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Network Validation - Social Proof and Third-Party Attestation */}
-          <div className="lg:col-span-2 space-y-6">
-            <NetworkValidation verifications={verifications} />
-          </div>
+        {/* ChittyID Growth Center - Primary Focus */}
+        <section className="mb-8">
+          <ChittyIDGrowthCenter user={user} badges={badges} verifications={verifications} />
+        </section>
 
-          {/* Risk Assessment and Verification Badges */}
-          <div className="space-y-6">
-            <RiskAssessment verifications={verifications} trustScore={user.trustScore || 0} />
+        {/* Gamified Experience Tabs */}
+        <Tabs defaultValue="achievements" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="achievements" className="flex items-center space-x-2">
+              <i className="fas fa-trophy"></i>
+              <span>Achievements</span>
+            </TabsTrigger>
+            <TabsTrigger value="network" className="flex items-center space-x-2">
+              <i className="fas fa-users-cog"></i>
+              <span>Network</span>
+            </TabsTrigger>
+            <TabsTrigger value="badges" className="flex items-center space-x-2">
+              <i className="fas fa-shield-check"></i>
+              <span>Badges</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="achievements" className="mt-6">
+            <AchievementSystem user={user} badges={badges} verifications={verifications} />
+          </TabsContent>
+          
+          <TabsContent value="network" className="mt-6">
+            <NetworkValidation verifications={verifications} />
+          </TabsContent>
+          
+          <TabsContent value="badges" className="mt-6">
             <VerificationBadges badges={badges} verifications={verifications} />
-            <IdentityCard user={user} verifications={verifications} badges={badges} />
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </main>
 
 
