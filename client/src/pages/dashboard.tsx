@@ -1,12 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import Header from "@/components/layout/header";
-import VerificationProgress from "@/components/ui/verification-progress";
-import BadgeGrid from "@/components/ui/badge-grid";
+import RiskAssessment from "@/components/ui/risk-assessment";
+import VerificationBadges from "@/components/ui/verification-badges";
 import IdentityCard from "@/components/ui/identity-card";
-import TrustScore from "@/components/ui/trust-score";
-import ActivityFeed from "@/components/ui/activity-feed";
-import VerificationModal from "@/components/ui/verification-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,7 +11,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 const DEMO_USER_ID = "demo-user-123";
 
 export default function Dashboard() {
-  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["/api/user", DEMO_USER_ID, "dashboard"],
@@ -88,7 +83,7 @@ export default function Dashboard() {
     );
   }
 
-  const { user, verifications, badges, activities, networkStats } = data;
+  const { user, verifications, badges, activities, networkStats } = data || {};
 
   return (
     <div className="min-h-screen bg-dark-bg-950">
@@ -142,102 +137,21 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Dashboard */}
-          <div className="lg:col-span-2 space-y-6">
-            <VerificationProgress verifications={verifications} />
-            <BadgeGrid badges={badges} />
-            <ActivityFeed activities={activities} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Risk Assessment - Primary Analysis */}
+          <div className="space-y-6">
+            <RiskAssessment verifications={verifications} trustScore={user.trustScore || 0} />
           </div>
 
-          {/* Sidebar */}
+          {/* Verification Badges - Data-Driven Trust */}
           <div className="space-y-6">
+            <VerificationBadges badges={badges} verifications={verifications} />
             <IdentityCard user={user} verifications={verifications} badges={badges} />
-            <TrustScore user={user} verifications={verifications} />
-            
-            {/* Quick Actions */}
-            <Card className="bg-dark-bg-800 border-slate-700/50">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-                <div className="space-y-3">
-                  <Button
-                    onClick={() => setIsVerificationModalOpen(true)}
-                    className="w-full bg-electric-blue-600/20 hover:bg-electric-blue-600/30 border border-electric-blue-500/30 text-electric-blue-400 justify-start"
-                    variant="outline"
-                    data-testid="button-verify-id"
-                  >
-                    <i className="fas fa-search mr-3"></i>
-                    Verify Another ID
-                  </Button>
-                  <Button
-                    className="w-full bg-mint-green-600/20 hover:bg-mint-green-600/30 border border-mint-green-500/30 text-mint-green-400 justify-start"
-                    variant="outline"
-                    data-testid="button-add-verification"
-                  >
-                    <i className="fas fa-plus mr-3"></i>
-                    Add Verification Method
-                  </Button>
-                  <Button
-                    className="w-full bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-400 justify-start"
-                    variant="outline"
-                    data-testid="button-export-data"
-                  >
-                    <i className="fas fa-download mr-3"></i>
-                    Export Identity Data
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Network Stats */}
-            <Card className="bg-dark-bg-800 border-slate-700/50">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Network Stats</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400 text-sm">Active Users</span>
-                    <span className="text-white font-semibold" data-testid="text-active-users">
-                      {networkStats.activeUsers.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400 text-sm">IDs Verified Today</span>
-                    <span className="text-mint-green-400 font-semibold" data-testid="text-verifications-today">
-                      {networkStats.verificationsToday.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400 text-sm">Trust Transactions</span>
-                    <span className="text-electric-blue-400 font-semibold" data-testid="text-trust-transactions">
-                      {(networkStats.trustTransactions / 1000).toFixed(0)}K
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400 text-sm">Your Rank</span>
-                    <span className="text-purple-400 font-semibold" data-testid="text-user-rank">
-                      #{Math.floor(Math.random() * 10000) + 1000}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </main>
 
-      <VerificationModal 
-        isOpen={isVerificationModalOpen}
-        onClose={() => setIsVerificationModalOpen(false)}
-      />
 
-      {/* Floating Action Button */}
-      <Button
-        onClick={() => setIsVerificationModalOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-electric-blue-500 to-mint-green-500 rounded-full p-0 shadow-2xl hover:scale-105 transition-transform z-40"
-        data-testid="button-fab-verify"
-      >
-        <i className="fas fa-search text-xl"></i>
-      </Button>
     </div>
   );
 }

@@ -82,20 +82,107 @@ export class MemStorage implements IStorage {
   }
 
   private initializeBadges() {
-    const defaultBadges: Omit<Badge, 'id'>[] = [
-      { name: "Email Pro", description: "Email verification completed", icon: "fas fa-envelope", color: "mint-green", requirement: "email_verified", category: "verification", isNft: false, contractAddress: null, tokenId: null, rarity: "common" },
-      { name: "Phone Master", description: "Phone verification completed", icon: "fas fa-phone", color: "electric-blue", requirement: "phone_verified", category: "verification", isNft: false, contractAddress: null, tokenId: null, rarity: "common" },
-      { name: "Profile Complete", description: "Complete your profile", icon: "fas fa-user", color: "purple", requirement: "profile_complete", category: "profile", isNft: false, contractAddress: null, tokenId: null, rarity: "common" },
-      { name: "Early Adopter", description: "One of the first users", icon: "fas fa-clock", color: "yellow", requirement: "early_adopter", category: "special", isNft: true, contractAddress: null, tokenId: null, rarity: "rare" },
-      { name: "Social Sharer", description: "Share your identity", icon: "fas fa-share", color: "pink", requirement: "social_share", category: "social", isNft: false, contractAddress: null, tokenId: null, rarity: "common" },
-      { name: "Trust Builder", description: "Build trust in the network", icon: "fas fa-shield-alt", color: "green", requirement: "trust_builder", category: "trust", isNft: true, contractAddress: null, tokenId: null, rarity: "epic" },
-      { name: "ID Verified", description: "Government ID verified", icon: "fas fa-id-card", color: "orange", requirement: "government_id_verified", category: "verification", isNft: false, contractAddress: null, tokenId: null, rarity: "rare" },
-      { name: "Biometric Master", description: "Biometric verification completed", icon: "fas fa-fingerprint", color: "red", requirement: "biometric_verified", category: "verification", isNft: true, contractAddress: null, tokenId: null, rarity: "epic" },
-      { name: "Blockchain Pioneer", description: "On-chain identity verified", icon: "fas fa-link", color: "purple", requirement: "blockchain_verified", category: "verification", isNft: true, contractAddress: null, tokenId: null, rarity: "legendary" },
-      { name: "Community Endorsed", description: "Received 5+ peer endorsements", icon: "fas fa-users", color: "blue", requirement: "social_endorsed", category: "social", isNft: true, contractAddress: null, tokenId: null, rarity: "rare" },
+    // Real verification badges that represent actual data points and trust levels
+    const verificationBadges: Omit<Badge, 'id'>[] = [
+      { 
+        name: "Domain Authority", 
+        description: "Email domain verified through SPF, DKIM, and DMARC records", 
+        icon: "fas fa-shield-alt", 
+        color: "#2563eb", // Blue - institutional trust
+        requirement: "domain_ownership", 
+        category: "infrastructure", 
+        isNft: false, 
+        contractAddress: null, 
+        tokenId: null, 
+        rarity: "rare" 
+      },
+      { 
+        name: "Financial Footprint", 
+        description: "Bank account verified with 6+ months transaction history", 
+        icon: "fas fa-university", 
+        color: "#059669", // Green - economic stability
+        requirement: "bank_verified", 
+        category: "financial", 
+        isNft: true, 
+        contractAddress: null, 
+        tokenId: null, 
+        rarity: "epic" 
+      },
+      { 
+        name: "Behavioral Consistency", 
+        description: "Device fingerprint consistent for 90+ days, stable location patterns", 
+        icon: "fas fa-chart-line", 
+        color: "#0891b2", // Cyan - behavioral data
+        requirement: "behavioral_pattern", 
+        category: "behavioral", 
+        isNft: false, 
+        contractAddress: null, 
+        tokenId: null, 
+        rarity: "common" 
+      },
+      { 
+        name: "Multi-Source Verification", 
+        description: "Identity cross-referenced across 5+ independent databases", 
+        icon: "fas fa-network-wired", 
+        color: "#7c3aed", // Purple - network validation
+        requirement: "multi_source", 
+        category: "cross-reference", 
+        isNft: true, 
+        contractAddress: null, 
+        tokenId: null, 
+        rarity: "legendary" 
+      },
+      { 
+        name: "Biometric Uniqueness", 
+        description: "Facial geometry scanned, liveness detected, no duplicates found", 
+        icon: "fas fa-eye", 
+        color: "#dc2626", // Red - biometric certainty
+        requirement: "biometric_unique", 
+        category: "biometric", 
+        isNft: true, 
+        contractAddress: null, 
+        tokenId: null, 
+        rarity: "epic" 
+      },
+      { 
+        name: "Physical Presence", 
+        description: "Address verified through utility bills, mail interception, GPS check-ins", 
+        icon: "fas fa-map-marker-alt", 
+        color: "#ea580c", // Orange - physical verification
+        requirement: "address_verified", 
+        category: "physical", 
+        isNft: false, 
+        contractAddress: null, 
+        tokenId: null, 
+        rarity: "rare" 
+      },
+      { 
+        name: "Social Graph Validation", 
+        description: "Identity confirmed by 3+ verified individuals with established histories", 
+        icon: "fas fa-users-cog", 
+        color: "#059669", // Green - social proof
+        requirement: "social_validated", 
+        category: "social", 
+        isNft: true, 
+        contractAddress: null, 
+        tokenId: null, 
+        rarity: "rare" 
+      },
+      { 
+        name: "Professional Credentials", 
+        description: "Employment verified, professional licenses checked, industry associations confirmed", 
+        icon: "fas fa-briefcase", 
+        color: "#4338ca", // Indigo - professional verification
+        requirement: "professional_verified", 
+        category: "professional", 
+        isNft: true, 
+        contractAddress: null, 
+        tokenId: null, 
+        rarity: "epic" 
+      }
     ];
 
-    defaultBadges.forEach(badge => {
+    verificationBadges.forEach(badge => {
       const id = randomUUID();
       this.badges.set(id, { ...badge, id });
     });
@@ -104,90 +191,154 @@ export class MemStorage implements IStorage {
   private async initializeDemoUser() {
     const demoUser: User = {
       id: "demo-user-123",
-      username: "demo_user",
+      username: "alex.rodriguez.verified",
       password: "demo123", // This would be hashed in real app
       chittyId: "25-P-USR-DEMO-V-08-7-K",
-      email: "demo@chittyid.com",
+      email: "alex.rodriguez@techcorp-industries.com",
       phone: "+1-555-0123",
-      fullName: "Alex Rodriguez",
+      fullName: "Alexander J. Rodriguez",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      trustLevel: 3,
-      trustScore: 650,
-      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+      trustLevel: 4,
+      trustScore: 850, // High trust from multiple verification sources
+      createdAt: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000), // 6 months ago for behavioral consistency
     };
     
     this.users.set("demo-user-123", demoUser);
 
-    // Add demo verifications
-    const emailVerification: VerificationMethod = {
+    // Add meaningful verification methods with actual data points
+    const domainVerification: VerificationMethod = {
       id: randomUUID(),
       userId: "demo-user-123",
-      type: "email",
+      type: "domain_ownership",
       status: "completed",
-      data: { email: "demo@chittyid.com" },
-      completedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
-      createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+      data: { 
+        domain: "techcorp-industries.com",
+        spfRecord: "v=spf1 include:_spf.google.com ~all",
+        dkimValid: true,
+        dmarcPolicy: "p=reject",
+        mxRecords: ["aspmx.l.google.com", "alt1.aspmx.l.google.com"],
+        dnsVerified: true,
+        employeeDirectory: true,
+        sslCertificate: "valid",
+        registrationAge: 2847 // days since domain registration
+      },
+      completedAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+      createdAt: new Date(Date.now() - 95 * 24 * 60 * 60 * 1000),
     };
 
-    const phoneVerification: VerificationMethod = {
+    const financialVerification: VerificationMethod = {
       id: randomUUID(),
       userId: "demo-user-123",
-      type: "phone",
+      type: "bank_verification",
       status: "completed",
-      data: { phone: "+1-555-0123" },
-      completedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
-      createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+      data: { 
+        bankName: "Chase Bank",
+        accountAge: 1247, // days
+        transactionHistory: 387, // number of transactions analyzed
+        averageBalance: 12500,
+        creditScore: 742,
+        employmentVerified: true,
+        salaryConsistent: true,
+        riskScore: 0.15, // low risk
+        fraudFlags: 0
+      },
+      completedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+      createdAt: new Date(Date.now() - 65 * 24 * 60 * 60 * 1000),
     };
 
-    const govIdVerification: VerificationMethod = {
+    const behavioralVerification: VerificationMethod = {
       id: randomUUID(),
       userId: "demo-user-123",
-      type: "government_id",
-      status: "in_review",
-      data: { documentType: "driver_license", submittedAt: new Date() },
-      completedAt: null,
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      type: "behavioral_analysis",
+      status: "completed",
+      data: { 
+        deviceFingerprint: "stable-180-days",
+        locationConsistency: 0.94,
+        timingPatterns: "human-like",
+        keyboardDynamics: "consistent",
+        mouseMovement: "natural",
+        sessionDuration: "normal-range",
+        suspiciousActivity: false,
+        botProbability: 0.02,
+        vpnUsage: false
+      },
+      completedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      createdAt: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
     };
 
-    this.verificationMethods.set(emailVerification.id, emailVerification);
-    this.verificationMethods.set(phoneVerification.id, phoneVerification);
-    this.verificationMethods.set(govIdVerification.id, govIdVerification);
+    const biometricVerification: VerificationMethod = {
+      id: randomUUID(),
+      userId: "demo-user-123",
+      type: "biometric_scan",
+      status: "completed",
+      data: { 
+        facialGeometry: "unique-confirmed",
+        livenessScore: 0.98,
+        duplicateCheck: "no-matches-found",
+        qualityScore: 0.95,
+        ageEstimate: 34,
+        genderConsistent: true,
+        photosAnalyzed: 3,
+        videoLiveness: true,
+        deepfakeDetection: "human-confirmed"
+      },
+      completedAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
+      createdAt: new Date(Date.now() - 47 * 24 * 60 * 60 * 1000),
+    };
 
-    // Award badges
-    const emailBadge = Array.from(this.badges.values()).find(b => b.requirement === "email_verified");
-    const phoneBadge = Array.from(this.badges.values()).find(b => b.requirement === "phone_verified");
-    const earlyAdopterBadge = Array.from(this.badges.values()).find(b => b.requirement === "early_adopter");
+    this.verificationMethods.set(domainVerification.id, domainVerification);
+    this.verificationMethods.set(financialVerification.id, financialVerification);
+    this.verificationMethods.set(behavioralVerification.id, behavioralVerification);
+    this.verificationMethods.set(biometricVerification.id, biometricVerification);
 
-    if (emailBadge) {
+    // Award badges based on completed verifications
+    const domainBadge = Array.from(this.badges.values()).find(b => b.requirement === "domain_ownership");
+    const financialBadge = Array.from(this.badges.values()).find(b => b.requirement === "bank_verified");
+    const behavioralBadge = Array.from(this.badges.values()).find(b => b.requirement === "behavioral_pattern");
+    const biometricBadge = Array.from(this.badges.values()).find(b => b.requirement === "biometric_unique");
+
+    if (domainBadge) {
       const userBadge: UserBadge = {
         id: randomUUID(),
         userId: "demo-user-123",
-        badgeId: emailBadge.id,
-        earnedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+        badgeId: domainBadge.id,
+        earnedAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
         mintedAt: null,
         transactionHash: null,
       };
       this.userBadges.set(userBadge.id, userBadge);
     }
 
-    if (phoneBadge) {
+    if (financialBadge) {
       const userBadge: UserBadge = {
         id: randomUUID(),
         userId: "demo-user-123",
-        badgeId: phoneBadge.id,
-        earnedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        badgeId: financialBadge.id,
+        earnedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
         mintedAt: null,
         transactionHash: null,
       };
       this.userBadges.set(userBadge.id, userBadge);
     }
 
-    if (earlyAdopterBadge) {
+    if (behavioralBadge) {
       const userBadge: UserBadge = {
         id: randomUUID(),
         userId: "demo-user-123",
-        badgeId: earlyAdopterBadge.id,
+        badgeId: behavioralBadge.id,
         earnedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        mintedAt: null,
+        transactionHash: null,
+      };
+      this.userBadges.set(userBadge.id, userBadge);
+    }
+
+    if (biometricBadge) {
+      const userBadge: UserBadge = {
+        id: randomUUID(),
+        userId: "demo-user-123",
+        badgeId: biometricBadge.id,
+        earnedAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
         mintedAt: null,
         transactionHash: null,
       };
