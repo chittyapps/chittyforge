@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
-import ChittyIDGrowthCenter from "@/components/ui/chitty-id-growth-center";
-import AchievementSystem from "@/components/ui/achievement-system";
+import ProfessionalCredentials from "@/components/ui/professional-credentials";
+import VerificationStatusBoard from "@/components/ui/verification-status-board";
 import NetworkValidation from "@/components/ui/network-validation";
-import VerificationBadges from "@/components/ui/verification-badges";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -139,38 +138,33 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* ChittyID Growth Center - Primary Focus */}
-        <section className="mb-8">
-          <ChittyIDGrowthCenter user={user} badges={badges} verifications={verifications} />
-        </section>
-
-        {/* Gamified Experience Tabs */}
-        <Tabs defaultValue="achievements" className="w-full">
+        {/* Professional Identity Verification */}
+        <Tabs defaultValue="status" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="achievements" className="flex items-center space-x-2">
-              <i className="fas fa-trophy"></i>
-              <span>Achievements</span>
+            <TabsTrigger value="status" className="flex items-center space-x-2">
+              <i className="fas fa-clipboard-check"></i>
+              <span>Verification Status</span>
+            </TabsTrigger>
+            <TabsTrigger value="credentials" className="flex items-center space-x-2">
+              <i className="fas fa-certificate"></i>
+              <span>Professional Credentials</span>
             </TabsTrigger>
             <TabsTrigger value="network" className="flex items-center space-x-2">
               <i className="fas fa-users-cog"></i>
-              <span>Network</span>
-            </TabsTrigger>
-            <TabsTrigger value="badges" className="flex items-center space-x-2">
-              <i className="fas fa-shield-check"></i>
-              <span>Badges</span>
+              <span>Network Validation</span>
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="achievements" className="mt-6">
-            <AchievementSystem user={user} badges={badges} verifications={verifications} />
+          <TabsContent value="status" className="mt-6">
+            <VerificationStatusBoard user={user} badges={badges} verifications={verifications} />
+          </TabsContent>
+          
+          <TabsContent value="credentials" className="mt-6">
+            <ProfessionalCredentials user={user} badges={badges} verifications={verifications} />
           </TabsContent>
           
           <TabsContent value="network" className="mt-6">
             <NetworkValidation verifications={verifications} />
-          </TabsContent>
-          
-          <TabsContent value="badges" className="mt-6">
-            <VerificationBadges badges={badges} verifications={verifications} />
           </TabsContent>
         </Tabs>
       </main>
